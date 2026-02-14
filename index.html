@@ -13,7 +13,7 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; opacity: 0.12; pointer-events: none; }
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: 1; opacity: 0.25; pointer-events: none; }
         
         #visualizer-canvas { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -32,7 +32,7 @@
         #bg2 { background-image: url('https://i.imgur.com/KQY6oXu.jpeg'); background-position: center 20%; }
         #bg3 { background-image: url('https://i.imgur.com/sImJwxU.png'); background-position: center 20%; }
 
-        #heart-canvas { position: relative; z-index: 100; cursor: pointer; transition: opacity 2s; }
+        #heart-canvas { position: relative; z-index: 100; cursor: pointer; transition: opacity 1s; }
 
         #player-control {
             position: fixed; top: 20px; right: 20px;
@@ -59,30 +59,31 @@
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             width: 85%; max-width: 650px; z-index: 9500;
-            max-height: 75vh; overflow-y: auto;
+            max-height: 80vh; overflow-y: auto;
             background: linear-gradient(135deg, #1a0505 0%, #3d0a0a 50%, #1a0505 100%);
-            padding: 40px; border-radius: 20px; border: 3px double #ff3300; 
-            box-shadow: 0 0 50px rgba(255, 51, 0, 0.4); color: #ffe0e0; text-align: justify;
+            padding: 30px; border-radius: 20px; border: 3px double #ff3300; 
+            box-shadow: 0 0 50px rgba(255, 51, 0, 0.4); color: #ffe0e0;
         }
 
-        .album-page { display: none; }
+        .album-page { display: none; text-align: justify; line-height: 1.6; }
         .album-page.active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .album-nav { display: flex; justify-content: space-between; margin-top: 30px; border-top: 1px solid rgba(255,51,0,0.3); padding-top: 20px; }
+        .album-nav { display: flex; justify-content: space-between; margin-top: 25px; border-top: 1px solid rgba(255,51,0,0.3); padding-top: 15px; }
+
         .btn-magic {
             padding: 10px 18px; background: rgba(255, 51, 0, 0.1); border: 1px solid #ff3300;
-            color: white; cursor: pointer; font-family: 'Courier New'; text-transform: uppercase;
+            color: white; cursor: pointer; font-family: 'Courier New'; text-transform: uppercase; transition: 0.3s;
         }
+        .btn-magic:hover { background: #ff3300; box-shadow: 0 0 15px #ff3300; }
 
         #final-screen {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             flex-direction: column; justify-content: center; align-items: center;
-            z-index: 4000; background: radial-gradient(circle, #300 0%, #000 100%);
+            z-index: 4000;
         }
 
         #contador-wrapper { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 4000; display: none; }
-        #contador-tiempo { font-size: 0.95rem; color: #ff69b4; text-shadow: 0 0 10px #ff0000; text-align: center; }
+        #contador-tiempo { font-size: 0.95rem; color: #ff69b4; text-shadow: 0 0 10px #ff0000; text-align: center; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 10px; border: 1px solid #f30; }
 
         .spinner { width: 24px; height: 24px; border: 3px solid rgba(255, 51, 0, 0.3); border-top: 3px solid #ff3300; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -114,22 +115,22 @@
     <div id="full-letter-container">
         <div id="page-1" class="album-page active">
             <h2 style="text-align:center; color:#ff3300;">Capítulo I: El Inicio</h2>
-            <div id="full-letter-text"></div>
+            <div id="text-content-1"></div>
         </div>
         <div id="page-2" class="album-page">
-            <h2 style="text-align:center; color:#ff3300;">Capítulo II: Recuerdos</h2>
-            <p style="text-align:center;">Próximamente guardaremos aquí más momentos mágicos... ❤️</p>
+            <h2 style="text-align:center; color:#ff3300;">Capítulo II: Nuestro Camino</h2>
+            <p>Aquí guardaremos las historias de los días que vendrán... cada risa, cada mensaje y cada momento que nos haga sonreír. ❤️</p>
         </div>
         <div class="album-nav">
             <button class="btn-magic" onclick="changePage(-1)">Atrás</button>
-            <button class="btn-magic" onclick="location.reload()">Inicio</button>
+            <button class="btn-magic" onclick="cerrarAlbum()">Cerrar</button>
             <button class="btn-magic" onclick="changePage(1)">Siguiente</button>
         </div>
     </div>
     
     <div id="final-screen">
         <h1 style="font-size: 8vw; text-shadow: 0 0 30px #f00; color:white; margin:0;">Alejandra ❤️</h1>
-        <button class="btn-magic" style="margin-top:20px" onclick="mostrarCartaCompleta()">Abrir Álbum</button>
+        <button class="btn-magic" style="margin-top:20px" onclick="abrirAlbum()">Abrir Álbum</button>
     </div>
 
     <div id="contador-wrapper">
@@ -148,6 +149,7 @@
         let audioCtx, analyser, dataArray;
         const nombre = "ALEJANDRA ";
         let width, height, ritmoLatido = 0, suavizadoIntensidad = 0;
+        let animMatrix, animHeart;
         const fechaInicio = new Date('2026-01-21T00:00:00');
 
         const frasesEfecto = [
@@ -180,10 +182,69 @@
             width = window.innerWidth; height = window.innerHeight;
             bgCanvas.width = width; bgCanvas.height = height;
             vCanvas.width = width; vCanvas.height = height;
-            const size = Math.min(width, height) * 0.9;
-            hCanvas.width = size; hCanvas.height = size;
+            hCanvas.width = Math.min(width, height) * 0.9;
+            hCanvas.height = hCanvas.width;
         }
         window.onresize = resize; resize();
+
+        // 1. LLUVIA DE CÓDIGO INICIAL
+        let matrixChars = [];
+        const columns = Math.floor(width / 20);
+        for(let i=0; i<columns; i++) matrixChars[i] = Math.random() * -height;
+
+        function drawMatrix() {
+            bgCtx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            bgCtx.fillRect(0, 0, width, height);
+            bgCtx.fillStyle = '#ff0000';
+            bgCtx.font = '14px monospace';
+            matrixChars.forEach((y, i) => {
+                bgCtx.fillText("love", i * 25, y);
+                if (y > height && Math.random() > 0.975) matrixChars[i] = 0;
+                else matrixChars[i] += 5;
+            });
+            animMatrix = requestAnimationFrame(drawMatrix);
+        }
+        drawMatrix();
+
+        // 2. CORAZÓN COMPACTO (AQUÍ ESTÁ EL CAMBIO QUE PEDISTE)
+        function drawHeart() {
+            hCtx.clearRect(0, 0, hCanvas.width, hCanvas.height);
+            const cx = hCanvas.width/2; 
+            const cy = hCanvas.height/2.2;
+            
+            hCtx.shadowBlur = 15; 
+            hCtx.shadowColor = "#ff0000";
+            hCtx.fillStyle = "#ff0000"; 
+            hCtx.font = "bold 12px Courier New"; // Letra más grande para unir
+            
+            let idx = 0; const lat = 1 + Math.sin(ritmoLatido) * 0.03;
+            // Pasos más cortos (7 y 10) para que las letras se toquen
+            for (let y = -150; y < 150; y += 10) {
+                for (let x = -160; x < 160; x += 7) {
+                    const nx = x/120, ny = -y/120;
+                    if (Math.pow(nx*nx + ny*ny - 1, 3) - nx*nx * ny*ny*ny < 0) {
+                        hCtx.fillText(nombre[idx % nombre.length], cx + x*lat, cy + y*lat); 
+                        idx++;
+                    }
+                }
+            }
+            ritmoLatido += 0.05; 
+            animHeart = requestAnimationFrame(drawHeart);
+        }
+        drawHeart();
+
+        // PARTÍCULAS DEL ESPECTRO
+        let particles = [];
+        function createParticle(full = false) {
+            const types = ['heart', 'sakura', 'flame'];
+            const type = types[Math.floor(Math.random() * 3)];
+            return { 
+                x: Math.random() * width, y: full ? Math.random() * height : height + 50, 
+                size: Math.random() * 5 + 3, type, color: {heart:'#ff1a1a', sakura:'#ffb7c5', flame:'#ff6600'}[type], 
+                speedY: Math.random() * 0.4 + 0.2, rot: Math.random() * 360 
+            };
+        }
+        for(let i=0; i<150; i++) particles.push(createParticle(true));
 
         function drawShape(ctx, type, size) {
             ctx.beginPath();
@@ -197,22 +258,6 @@
             ctx.fill();
         }
 
-        let particles = [];
-        function createParticle(full = false) {
-            const types = ['heart', 'sakura', 'flame'];
-            const type = types[Math.floor(Math.random() * 3)];
-            const colors = { heart: '#ff1a1a', sakura: '#ffb7c5', flame: '#ff6600' };
-            return { 
-                x: Math.random() * width, 
-                y: full ? Math.random() * height : height + 50, 
-                size: Math.random() * 5 + 3, 
-                type, color: colors[type], 
-                speedY: Math.random() * 0.4 + 0.2, 
-                rot: Math.random() * 360 
-            };
-        }
-        for(let i=0; i<150; i++) particles.push(createParticle(true));
-
         function updateParticles() {
             vCtx.clearRect(0, 0, width, height);
             let intensidad = 0;
@@ -220,54 +265,28 @@
                 analyser.getByteFrequencyData(dataArray);
                 intensidad = dataArray[20] / 255;
             }
-            // SUAVIZADO EXTREMO PARA EVITAR LAG
             suavizadoIntensidad += (intensidad - suavizadoIntensidad) * 0.05;
-            
             particles.forEach((p, i) => {
-                p.y -= p.speedY + (suavizadoIntensidad * 4);
-                p.rot += 0.5;
-                vCtx.save(); 
-                vCtx.translate(p.x, p.y); 
-                vCtx.rotate(p.rot * Math.PI / 180); 
-                vCtx.fillStyle = p.color; 
-                vCtx.globalAlpha = 0.4 + (suavizadoIntensidad * 0.4); 
-                vCtx.shadowBlur = 10 + (suavizadoIntensidad * 15);
-                vCtx.shadowColor = p.color;
-                drawShape(vCtx, p.type, p.size); 
-                vCtx.restore();
+                p.y -= p.speedY + (suavizadoIntensidad * 4); p.rot += 0.5;
+                vCtx.save(); vCtx.translate(p.x, p.y); vCtx.rotate(p.rot * Math.PI / 180); 
+                vCtx.fillStyle = p.color; vCtx.globalAlpha = 0.4 + (suavizadoIntensidad * 0.4); 
+                vCtx.shadowBlur = 10; vCtx.shadowColor = p.color;
+                drawShape(vCtx, p.type, p.size); vCtx.restore();
                 if (p.y < -50) particles[i] = createParticle();
             });
             requestAnimationFrame(updateParticles);
         }
         updateParticles();
 
-        function drawHeart() {
-            hCtx.clearRect(0, 0, hCanvas.width, hCanvas.height);
-            const cx = hCanvas.width/2; const cy = hCanvas.height/2.2;
-            hCtx.fillStyle = "#ff0000"; hCtx.font = "bold 11px Courier New";
-            let idx = 0; const lat = 1 + Math.sin(ritmoLatido) * 0.03;
-            for (let y = -150; y < 150; y += 12) {
-                for (let x = -160; x < 160; x += 8.5) {
-                    const nx = x/125, ny = -y/125;
-                    if (Math.pow(nx*nx + ny*ny - 1, 3) - nx*nx * ny*ny*ny < 0) {
-                        hCtx.fillText(nombre[idx % nombre.length], cx + x*lat, cy + y*lat); idx++;
-                    }
-                }
-            }
-            ritmoLatido += 0.04; requestAnimationFrame(drawHeart);
-        }
-        drawHeart();
-
         function iniciarTodo() {
-            hCanvas.style.opacity = "0"; document.getElementById('main-label').style.opacity = "0";
+            cancelAnimationFrame(animMatrix); cancelAnimationFrame(animHeart);
+            bgCanvas.style.display = "none"; hCanvas.style.display = "none";
+            document.getElementById('main-label').style.display = "none";
             document.getElementById('visualizer-canvas').style.opacity = "1";
-            setTimeout(() => hCanvas.style.display = "none", 2000);
             document.getElementById('player-control').style.display = 'flex';
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser(); 
-                analyser.fftSize = 256; // Tamaño reducido para mejor rendimiento
-                analyser.smoothingTimeConstant = 0.9; 
+                analyser = audioCtx.createAnalyser(); analyser.fftSize = 256;
                 source = audioCtx.createMediaElementSource(radioAudio);
                 source.connect(analyser); analyser.connect(audioCtx.destination);
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -303,39 +322,40 @@
             document.getElementById('contador-wrapper').style.display = "block";
         }
 
-        function mostrarCartaCompleta() {
+        function abrirAlbum() {
             document.getElementById('final-screen').style.display = "none";
-            document.getElementById('full-letter-text').innerHTML = `<strong>Aleja...</strong><br><br>A veces me detengo a pensar en cómo el mundo sigue su curso, mientras que para mí, en solo 24 días, todo ha cambiado de color. He aprendido que lo esencial es invisible a los ojos y que solo con el corazón se puede ver la magia que estamos construyendo. Tú te has convertido en esa rosa única para mí; no por el tiempo que llevamos, sino por la luz y la vida que le pones a cada palabra que compartimos.<br><br>Siento que, como en esas historias donde los hilos del destino se cruzan en el cielo, nuestros nombres ya estaban escritos para encontrarse. A veces alguien aparece y, de repente, el paisaje cambia por completo; te das cuenta de que el mundo no es solo lo que ves, sino esa sensación de libertad de correr sin cadenas hacia un mundo nuevo por descubrir. No me importa si el tiempo corre deprisa o si el mundo parece ir en contra; si la vida fuera un viaje eterno entre las estrellas, no me importaría estar atrapado en el espacio si es contigo, porque tú haces que cualquier lugar, por lejano que sea, se sienta como mi lugar seguro solo porque tú estás allí.<br><br>Me cautiva tu forma de ser. Tienes esa luz que me hace querer descubrir todos esos pequeños detalles en ti que quizás nadie más nota, pero que para mí son tu verdadera belleza. Me gustas de una forma tan real que no puedo evitar sonreír al pensarte; eres esa melodía que no sabía que necesitaba escuchar y que ahora no quiero que deje de sonar. Una canción que suena en mi mente una y otra vez, aunque el tiempo nos cambie, hay algo en nosotros que está destinado a permanecer siempre el mismo día.<br><br>No quiero ser alguien que pase por tu vida solo de visita. Quiero ser quien se quede, quien te elija todos los días de mi vida, con la sinceridad de un primer amor que se siente como si fuera para toda la vida. Porque conocerte ha sido como encontrar la pieza que le faltaba a mi rompecabezas; alguien que me hace creer en los 'para siempre' y que me hace sentir que, sin importar dónde estemos (ya sea sentados en una banca, caminando bajo la lluvia o perdidos en un jardín escondido), estar a tu lado es el único lugar donde quiero estar.<br><br>Hoy, 14 de febrero, solo quiero darte las gracias. Gracias por dejarme entrar en tu mundo, por las risas y por ser esa casualidad que parece haber sido planeada por El creador del universo desde hace mil años. Puede que no sepa qué pasará mañana, pero hoy sé que eres mi presente más bonito y que estos 24 días son solo el inicio de nuestra propia historia, la que quiero seguir contando contigo.`;
+            document.getElementById('text-content-1').innerHTML = `<strong>Aleja...</strong><br><br>A veces me detengo a pensar en cómo el mundo sigue su curso, mientras que para mí, en solo 24 días, todo ha cambiado de color. He aprendido que lo esencial es invisible a los ojos y que solo con el corazón se puede ver la magia que estamos construyendo. Tú te has convertido en esa rosa única para mí; no por el tiempo que llevamos, sino por la luz y la vida que le pones a cada palabra que compartimos.<br><br>Siento que, como en esas historias donde los hilos del destino se cruzan en el cielo, nuestros nombres ya estaban escritos para encontrarse. A veces alguien aparece y, de repente, el paisaje cambia por completo; te das cuenta de que el mundo no es solo lo que ves, sino esa sensación de libertad de correr sin cadenas hacia un mundo nuevo por descubrir. No me importa si el tiempo corre deprisa o si el mundo parece ir en contra; si la vida fuera un viaje eterno entre las estrellas, no me importaría estar atrapado en el espacio si es contigo, porque tú haces que cualquier lugar, por lejano que sea, se sienta como mi lugar seguro solo porque tú estás allí.<br><br>Me cautiva tu forma de ser. Tienes esa luz que me hace querer descubrir todos esos pequeños detalles en ti que quizás nadie más nota, pero que para mí son tu verdadera belleza. Me gustas de una forma tan real que no puedo evitar sonreír al pensarte; eres esa melodía que no sabía que necesitaba escuchar y que ahora no quiero que deje de sonar. Una canción que suena en mi mente una y otra vez, aunque el tiempo nos cambie, hay algo en nosotros que está destinado a permanecer siempre el mismo día.<br><br>No quiero ser alguien que pase por tu vida solo de visita. Quiero ser quien se quede, quien te elija todos los días de mi vida, con la sinceridad de un primer amor que se siente como si fuera para toda la vida. Porque conocerte ha sido como encontrar la pieza que le faltaba a mi rompecabezas; alguien que me hace creer en los 'para siempre' y que me hace sentir que, sin importar dónde estemos, estar a tu lado es el único lugar donde quiero estar.<br><br>Hoy, 14 de febrero, solo quiero darte las gracias. Gracias por dejarme entrar en tu mundo, por las risas y por ser esa casualidad que parece haber sido planeada por El creador del universo desde hace mil años. Puede que no sepa qué pasará mañana, pero hoy sé que eres mi presente más bonito y que estos 24 días son solo el inicio de nuestra propia historia, la que quiero seguir contando contigo.`;
             document.getElementById('full-letter-container').style.display = "block";
+        }
+
+        function cerrarAlbum() {
+            document.getElementById('full-letter-container').style.display = "none";
+            document.getElementById('final-screen').style.display = "flex";
         }
 
         let currentPage = 1;
         function changePage(dir) {
-            const pages = document.querySelectorAll('.album-page');
-            document.getElementById(`page-${currentPage}`).classList.remove('active');
+            document.getElementById(`page-${currentPage}`).style.display = "none";
             currentPage += dir;
-            if(currentPage < 1) currentPage = 1;
-            if(currentPage > pages.length) currentPage = pages.length;
-            document.getElementById(`page-${currentPage}`).classList.add('active');
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > 2) currentPage = 2;
+            document.getElementById(`page-${currentPage}`).style.display = "block";
         }
 
         function toggleAudio() {
             const playIcon = document.getElementById('play-icon'), pauseIcon = document.getElementById('pause-icon'), spinner = document.getElementById('loading-spinner');
             if (radioAudio.paused) {
-                spinner.style.display = 'block'; playIcon.style.display = 'none'; pauseIcon.style.display = 'none';
+                spinner.style.display = 'block'; playIcon.style.display = 'none';
                 if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
                 radioAudio.src = "https://stream.zeno.fm/cr8evht2huruv?v=" + Date.now();
-                radioAudio.load(); 
                 radioAudio.oncanplay = () => { spinner.style.display = 'none'; pauseIcon.style.display = 'block'; radioAudio.play(); };
             } else {
-                radioAudio.pause(); radioAudio.src = ""; 
-                spinner.style.display = 'none'; playIcon.style.display = 'block'; pauseIcon.style.display = 'none';
+                radioAudio.pause(); radioAudio.src = ""; playIcon.style.display = 'block'; pauseIcon.style.display = 'none';
             }
         }
 
         function actualizarContador() {
-            const ahora = new Date();
-            const diferencia = ahora - fechaInicio;
+            const diferencia = new Date() - fechaInicio;
             const seg = Math.floor((diferencia / 1000) % 60);
             const min = Math.floor((diferencia / 1000 / 60) % 60);
             const hor = Math.floor((diferencia / (1000 * 60 * 60)) % 24);
